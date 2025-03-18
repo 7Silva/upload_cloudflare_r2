@@ -1,0 +1,12 @@
+spring.application.name=cdn-r2
+spring.data.mongodb.database=
+spring.data.mongodb.username=${MONGODB_USERNAME}
+spring.data.mongodb.password=${MONGODB_PASSWORD}
+spring.data.mongodb.authentication-database=
+
+# R2 Keys
+cloudflare.r2.access-key-id=${R2_ACCESS_KEY_ID}
+cloudflare.r2.secret-access-key=${R2_SECRET_ACCESS_KEY}
+cloudflare.r2.account-id=${R2_ACCOUNT_ID}
+cloudflare.r2.bucket-name=${R2_BUCKET_NAME}
+cloudflare.r2.endpoint=${R2_ENDPOINT}
