@@ -32,9 +32,7 @@ public class UploadController {
                         .body(ApiResponse.error("Forneça um arquivo para ser enviado!"));
             }
 
-            String ipAddress = request.getRemoteAddr();
-
-            String fileName = uploadToR2UseCase.execute(file, ipAddress);
+            String fileName = uploadToR2UseCase.execute(file);
             return ResponseEntity.ok(
                     ApiResponse.success(fileName, "Arquivo enviado com sucesso"));
         } catch (Exception e) {

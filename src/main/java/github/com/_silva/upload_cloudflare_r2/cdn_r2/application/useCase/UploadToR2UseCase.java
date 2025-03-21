@@ -6,14 +6,12 @@ import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import github.com._silva.upload_cloudflare_r2.cdn_r2.domain.entity.UploadEntity;
 import github.com._silva.upload_cloudflare_r2.cdn_r2.domain.repository.UploadRepository;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
+import github.com._silva.upload_cloudflare_r2.cdn_r2.infrastructure.IpBasedFilterKeyResolver;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -28,16 +26,19 @@ public class UploadToR2UseCase {
     @Autowired
     private UploadRepository uploadRepository;
 
+    @Autowired
+    private IpBasedFilterKeyResolver rateLimitKeyResolver;
+
     @Value("${cloudflare.r2.bucket-name}")
     public String bucketName;
 
-    public String execute(MultipartFile file, String ipAddress) {
+    public String execute(MultipartFile file) {
         String fileName = generateFileName(file.getOriginalFilename());
         String fileType = file.getContentType();
         String folderPrefix = getFolderPrefix(fileType);
         String storageKey = folderPrefix + fileName;
 
-        UploadEntity uploadEntity = createUploadEntity(file, fileName, ipAddress ,fileType);
+        UploadEntity uploadEntity = createUploadEntity(file, fileName, rateLimitKeyResolver.getClientIpAddress() ,fileType);
 
         try {
             uploadFileToR2(storageKey, file);
