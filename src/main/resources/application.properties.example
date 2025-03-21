@@ -6,6 +6,8 @@ spring.data.mongodb.username=${MONGODB_USERNAME}
 spring.data.mongodb.password=${MONGODB_PASSWORD}
 spring.data.mongodb.authentication-database=
 
+server.port=${PORT:3006}
+
 # R2 Keys
 cloudflare.r2.access-key-id=${R2_ACCESS_KEY_ID}
 cloudflare.r2.secret-access-key=${R2_SECRET_ACCESS_KEY}
