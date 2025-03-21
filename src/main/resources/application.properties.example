@@ -8,6 +8,11 @@ spring.data.mongodb.authentication-database=
 
 server.port=${PORT:3006}
 
+# Actuator
+management.endpoints.web.exposure.include=health,metrics,prometheus
+management.endpoint.health.show-details=always
+management.endpoints.web.base-path=/cdn/actuator
+
 # R2 Keys
 cloudflare.r2.access-key-id=${R2_ACCESS_KEY_ID}
 cloudflare.r2.secret-access-key=${R2_SECRET_ACCESS_KEY}
