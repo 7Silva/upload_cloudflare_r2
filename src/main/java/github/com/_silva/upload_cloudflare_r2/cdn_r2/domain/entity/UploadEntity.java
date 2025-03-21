@@ -18,5 +18,6 @@ public class UploadEntity {
     private String fileType;
     private String status;
     private String errorMessage;
+    private String ipAddress;
     private LocalDateTime createdAt;
 }

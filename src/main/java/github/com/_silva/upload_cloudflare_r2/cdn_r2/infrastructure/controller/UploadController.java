@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import github.com._silva.upload_cloudflare_r2.cdn_r2.application.useCase.UploadToR2UseCase;
 import github.com._silva.upload_cloudflare_r2.cdn_r2.infrastructure.response.ApiResponse;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/cdn/v1")
@@ -24,14 +25,16 @@ public class UploadController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<ApiResponse<String>> upload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ApiResponse<String>> upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
         try {
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest()
                         .body(ApiResponse.error("Forneça um arquivo para ser enviado!"));
             }
 
-            String fileName = uploadToR2UseCase.execute(file);
+            String ipAddress = request.getRemoteAddr();
+
+            String fileName = uploadToR2UseCase.execute(file, ipAddress);
             return ResponseEntity.ok(
                     ApiResponse.success(fileName, "Arquivo enviado com sucesso"));
         } catch (Exception e) {

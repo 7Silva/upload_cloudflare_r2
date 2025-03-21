@@ -6,11 +6,14 @@ import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties.Http;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import github.com._silva.upload_cloudflare_r2.cdn_r2.domain.entity.UploadEntity;
 import github.com._silva.upload_cloudflare_r2.cdn_r2.domain.repository.UploadRepository;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -28,13 +31,13 @@ public class UploadToR2UseCase {
     @Value("${cloudflare.r2.bucket-name}")
     public String bucketName;
 
-    public String execute(MultipartFile file) {
+    public String execute(MultipartFile file, String ipAddress) {
         String fileName = generateFileName(file.getOriginalFilename());
         String fileType = file.getContentType();
         String folderPrefix = getFolderPrefix(fileType);
         String storageKey = folderPrefix + fileName;
 
-        UploadEntity uploadEntity = createUploadEntity(file, fileName, fileType);
+        UploadEntity uploadEntity = createUploadEntity(file, fileName, ipAddress ,fileType);
 
         try {
             uploadFileToR2(storageKey, file);
@@ -61,11 +64,12 @@ public class UploadToR2UseCase {
     return System.currentTimeMillis() + "_" + sanitizedFileName;
 }
 
-    private UploadEntity createUploadEntity(MultipartFile file, String fileName, String fileType) {
+    private UploadEntity createUploadEntity(MultipartFile file, String fileName, String ipAddress, String fileType) {
         UploadEntity uploadEntity = new UploadEntity();
         uploadEntity.setFileName(fileName);
         uploadEntity.setFileSize(file.getSize());
         uploadEntity.setFileType(fileType);
+        uploadEntity.setIpAddress(ipAddress);
         uploadEntity.setCreatedAt(LocalDateTime.now());
         return uploadEntity;
     }
