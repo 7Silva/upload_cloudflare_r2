@@ -1,7 +1,7 @@
 services:
   api:
     build: .
-    container_name: cdn_r2_api
+    container_name: cdn_r2_java
     ports:
       - "3006:3006"
     environment:
