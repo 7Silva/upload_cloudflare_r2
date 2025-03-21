@@ -40,7 +40,6 @@ public class UploadToR2UseCase {
             uploadFileToR2(storageKey, file);
             uploadEntity.setStatus("ENVIADO");
         } catch (IOException e) {
-            System.err.println("Failed to upload file to R2: " + e.getMessage());
             handleUploadError(uploadEntity, e);
             return "Erro ao enviar o arquivo: " + e.getMessage();
         }
