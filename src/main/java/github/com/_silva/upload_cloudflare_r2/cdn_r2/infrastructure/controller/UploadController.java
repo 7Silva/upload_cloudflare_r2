@@ -1,4 +1,4 @@
-package github.com._silva.upload_cloudflare_r2.cdn_r2.upload.controller;
+package github.com._silva.upload_cloudflare_r2.cdn_r2.infrastructure.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import github.com._silva.upload_cloudflare_r2.cdn_r2.upload.useCases.UploadToR2UseCase;
+import github.com._silva.upload_cloudflare_r2.cdn_r2.application.useCase.UploadToR2UseCase;
 
 @RestController
 @RequestMapping("/cdn/v1")
@@ -23,7 +23,7 @@ public class UploadController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> upload(@RequestParam("file") MultipartFile file) {
         String fileName = uploadToR2UseCase.execute(file);
            return ResponseEntity.ok()
                     .body("Arquivo enviado com sucesso: " + fileName);

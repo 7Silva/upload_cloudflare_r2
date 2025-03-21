@@ -23,5 +23,10 @@
     "name": "cloudflare.r2.secret-access-key",
     "type": "java.lang.String",
     "description": "A description for 'cloudflare.r2.secret-access-key'"
+  },
+  {
+    "name": "api.key",
+    "type": "java.lang.String",
+    "description": "A description for 'api.key'"
   }
-]} 
+]}

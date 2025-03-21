@@ -1,4 +1,6 @@
 spring.application.name=cdn-r2
+spring.servlet.multipart.max-file-size=30MB
+spring.servlet.multipart.max-request-size=30MB
 spring.data.mongodb.database=
 spring.data.mongodb.username=${MONGODB_USERNAME}
 spring.data.mongodb.password=${MONGODB_PASSWORD}
@@ -10,3 +12,6 @@ cloudflare.r2.secret-access-key=${R2_SECRET_ACCESS_KEY}
 cloudflare.r2.account-id=${R2_ACCOUNT_ID}
 cloudflare.r2.bucket-name=${R2_BUCKET_NAME}
 cloudflare.r2.endpoint=${R2_ENDPOINT}
+
+# API Auth
+api.key=${API_KEY}

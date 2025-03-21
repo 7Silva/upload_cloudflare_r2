@@ -1,4 +1,4 @@
-package github.com._silva.upload_cloudflare_r2.cdn_r2.upload;
+package github.com._silva.upload_cloudflare_r2.cdn_r2.domain.entity;
 
 import java.time.LocalDateTime;
 
