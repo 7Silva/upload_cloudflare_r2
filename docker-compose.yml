@@ -5,6 +5,7 @@ services:
     ports:
       - "3006:3006"
     environment:
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
       - MONGODB_USERNAME=${MONGODB_USERNAME}
       - MONGODB_PASSWORD=${MONGODB_PASSWORD}
       - SPRING_DATA_MONGODB_HOST=mongodb
@@ -14,6 +15,7 @@ services:
       - R2_BUCKET_NAME=${R2_BUCKET_NAME}
       - R2_ENDPOINT=${R2_ENDPOINT}
       - API_KEY=${API_KEY}
+      - CDN_URL=${CDN_URL}
     depends_on:
       - mongodb
 
