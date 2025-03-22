@@ -3,10 +3,7 @@ package github.com._silva.upload_cloudflare_r2.cdn_r2.application.useCase;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,7 +15,6 @@ import github.com._silva.upload_cloudflare_r2.cdn_r2.infrastructure.IpBasedFilte
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 public class UploadToR2UseCase {
@@ -84,23 +80,14 @@ public class UploadToR2UseCase {
     }
 
     private void uploadFileToR2(String key, MultipartFile file) throws IOException {
-        Map<String, String> metadata = new HashMap<>();
-        metadata.put("Content-Type", file.getContentType());
-
         PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .contentType(file.getContentType())
-                .contentLength(file.getSize())
-                .metadata(metadata)
-                .build();
+            .bucket(bucketName)
+            .key(key)
+            .contentType(file.getContentType())
+            .build();
 
-        try {
-            s3Client.putObject(request,
-                    RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-        } catch (S3Exception e) {
-            throw new FileUploadException("Erro ao fazer upload: " + e.getMessage(), e);
-        }
+        s3Client.putObject(request,
+            RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
     }
 
     private String getFolderPrefix(String fileType) {
