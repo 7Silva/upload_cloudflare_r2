@@ -21,11 +21,23 @@ public class UploadController {
 
     @PostMapping("/upload")
     public ResponseEntity<ApiResponse<String>> upload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
-        if (file.isEmpty()) {
-            throw new InvalidFileException("Forneça um arquivo válido para ser enviado!");
-        }
+    if (file == null || file.isEmpty()) {
+        throw new InvalidFileException("Forneça um arquivo válido para ser enviado!");
+    }
 
-        String fileName = uploadToR2UseCase.execute(file);
-        return ResponseEntity.ok(ApiResponse.success(fileName, "Arquivo enviado com sucesso"));
+    String contentType = file.getContentType();
+    if (contentType == null || !isValidContentType(contentType)) {
+        throw new InvalidFileException("Tipo de arquivo não suportado!");
+    }
+
+    String fileName = uploadToR2UseCase.execute(file);
+    return ResponseEntity.ok(ApiResponse.success(fileName, "Arquivo enviado com sucesso"));
+    }
+
+    private boolean isValidContentType(String contentType) {
+        return contentType.startsWith("audio/") || 
+               contentType.startsWith("video/") || 
+               contentType.startsWith("image/") ||
+               contentType.equals("application/pdf");
     }
 }

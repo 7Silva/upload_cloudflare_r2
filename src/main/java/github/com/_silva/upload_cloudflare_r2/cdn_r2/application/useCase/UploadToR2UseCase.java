@@ -3,7 +3,10 @@ package github.com._silva.upload_cloudflare_r2.cdn_r2.application.useCase;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.tomcat.util.http.fileupload.FileUploadException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,7 @@ import github.com._silva.upload_cloudflare_r2.cdn_r2.infrastructure.IpBasedFilte
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 public class UploadToR2UseCase {
@@ -41,8 +45,8 @@ public class UploadToR2UseCase {
         String folderPrefix = getFolderPrefix(fileType);
         String storageKey = folderPrefix + fileName;
 
-
-        UploadEntity uploadEntity = createUploadEntity(file, fileName, rateLimitKeyResolver.getClientIpAddress() ,fileType);
+        UploadEntity uploadEntity = createUploadEntity(file, fileName, rateLimitKeyResolver.getClientIpAddress(),
+                fileType);
 
         try {
             uploadFileToR2(storageKey, file);
@@ -57,17 +61,17 @@ public class UploadToR2UseCase {
     }
 
     private String generateFileName(String originalFileName) {
-    if (originalFileName == null) {
-        return System.currentTimeMillis() + "-unnamed";
+        if (originalFileName == null) {
+            return System.currentTimeMillis() + "-unnamed";
+        }
+
+        String normalized = Normalizer.normalize(originalFileName, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+
+        String sanitizedFileName = normalized
+                .replaceAll("[^a-zA-Z0-9.]", "_");
+        return System.currentTimeMillis() + "_" + sanitizedFileName;
     }
-
-    String normalized = Normalizer.normalize(originalFileName, Normalizer.Form.NFD)
-            .replaceAll("\\p{M}", ""); 
-
-    String sanitizedFileName = normalized
-            .replaceAll("[^a-zA-Z0-9.]", "_");
-    return System.currentTimeMillis() + "_" + sanitizedFileName;
-}
 
     private UploadEntity createUploadEntity(MultipartFile file, String fileName, String ipAddress, String fileType) {
         UploadEntity uploadEntity = new UploadEntity();
@@ -80,14 +84,23 @@ public class UploadToR2UseCase {
     }
 
     private void uploadFileToR2(String key, MultipartFile file) throws IOException {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("Content-Type", file.getContentType());
+
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
                 .contentType(file.getContentType())
+                .contentLength(file.getSize())
+                .metadata(metadata)
                 .build();
-        RequestBody requestBody = RequestBody.fromInputStream(file.getInputStream(), file.getSize());
 
-        s3Client.putObject(request, requestBody);
+        try {
+            s3Client.putObject(request,
+                    RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+        } catch (S3Exception e) {
+            throw new FileUploadException("Erro ao fazer upload: " + e.getMessage(), e);
+        }
     }
 
     private String getFolderPrefix(String fileType) {
