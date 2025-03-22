@@ -29,6 +29,9 @@ public class UploadToR2UseCase {
     @Autowired
     private IpBasedFilterKeyResolver rateLimitKeyResolver;
 
+    @Value("${cdn.url}")
+    public String cdnURL;
+
     @Value("${cloudflare.r2.bucket-name}")
     public String bucketName;
 
@@ -37,6 +40,7 @@ public class UploadToR2UseCase {
         String fileType = file.getContentType();
         String folderPrefix = getFolderPrefix(fileType);
         String storageKey = folderPrefix + fileName;
+
 
         UploadEntity uploadEntity = createUploadEntity(file, fileName, rateLimitKeyResolver.getClientIpAddress() ,fileType);
 
@@ -49,7 +53,7 @@ public class UploadToR2UseCase {
         }
 
         uploadRepository.save(uploadEntity);
-        return storageKey;
+        return cdnURL + storageKey;
     }
 
     private String generateFileName(String originalFileName) {
@@ -82,6 +86,7 @@ public class UploadToR2UseCase {
                 .contentType(file.getContentType())
                 .build();
         RequestBody requestBody = RequestBody.fromInputStream(file.getInputStream(), file.getSize());
+
         s3Client.putObject(request, requestBody);
     }
 

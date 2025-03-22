@@ -27,6 +27,11 @@
   {
     "name": "api.key",
     "type": "java.lang.String",
-    "description": "A description for 'api.key'"
+    "description": "The authorization key to access the API routes (Example: 1234)"
+  },
+  {
+    "name": "cdn.url",
+    "type": "java.lang.String",
+    "description": "Your CDN URL (Access URL for the images)"
   }
 ]}
