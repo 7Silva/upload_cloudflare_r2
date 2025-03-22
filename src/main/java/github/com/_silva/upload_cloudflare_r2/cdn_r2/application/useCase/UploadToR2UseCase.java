@@ -3,6 +3,8 @@ package github.com._silva.upload_cloudflare_r2.cdn_r2.application.useCase;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,14 +82,21 @@ public class UploadToR2UseCase {
     }
 
     private void uploadFileToR2(String key, MultipartFile file) throws IOException {
-        PutObjectRequest request = PutObjectRequest.builder()
-            .bucket(bucketName)
-            .key(key)
-            .contentType(file.getContentType())
-            .build();
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("Content-Type", file.getContentType());
 
-        s3Client.putObject(request,
-            RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+        // Lê todo o conteúdo do arquivo primeiro
+        byte[] fileContent = file.getBytes();
+
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .contentType(file.getContentType())
+                .contentLength((long) fileContent.length)
+                .metadata(metadata)
+                .build();
+
+        s3Client.putObject(request, RequestBody.fromBytes(fileContent));
     }
 
     private String getFolderPrefix(String fileType) {
